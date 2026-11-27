@@ -43,8 +43,6 @@ type Section =
   | 'soundtrack'
   | 'surprise'
   | 'reasons'
-  | 'today'
-  | 'timeline'
 
 const photos = [
   '/images/p1.jpeg',
@@ -123,32 +121,6 @@ const features: { id: Section; title: string; subtitle: string; icon: typeof Hea
   { id: 'badday', title: 'Bad day', subtitle: 'Let me remind you', icon: Sun, color: 'yellow' },
   { id: 'smile', title: 'Make me smile', subtitle: 'Something silly & sweet', icon: Smile, color: 'pink' },
 ]
-const todayIdeas = [
-  { note: "Even from far away, you're still part of my everyday.", question: "What's one little thing that made you smile today?", activity: "Send me a voice note telling me one random thing about your day." },
-  { note: "I hope you remember that you don't have to be perfect to be loved.", question: "What would you love us to do together on our next day?", activity: "Pick a song for our next little dance." },
-  { note: "You make my world softer, brighter, and better.", question: "What's something you wish I could see right now?", activity: "Take a photo of something around you that you'd like to show me." },
-  { note: "Somewhere, someone is counting the days until your hug. Me.", question: "What's a memory of us that you replay sometimes?", activity: "Choose one photo of us and tell me the story behind it." },
-  { note: "I am proud of you for all the little things you do.", question: "What can I do today to make you feel a little more loved?", activity: "Let's both take five minutes to slow down and breathe." },
-  { note: "You are my favourite part of every day, even when we're apart.", question: "If we had a free day together, what would our first stop be?", activity: "Make a tiny wishlist for our next reunion." },
-  { note: "Distance is just a chapter. You're still my person.", question: "What is one new thing you'd like us to try together?", activity: "Send each other a meme that perfectly describes us." },
-]
-function getTodayIdea() {
-  const now = new Date()
-  const day = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000)
-  return todayIdeas[day % todayIdeas.length]
-}
-
-type MemoryEvent = { id: number; date: string; title: string; description: string; icon: string }
-const defaultTimeline: MemoryEvent[] = [
-  { id: 1, date: '', title: 'The start of us', description: 'The day our story began.', icon: '♡' },
-  { id: 2, date: '', title: 'A special moment', description: 'A memory we want to keep forever.', icon: '✦' },
-]
-function loadTimeline(): MemoryEvent[] {
-  try { return JSON.parse(localStorage.getItem('closer-timeline') || JSON.stringify(defaultTimeline)) }
-  catch { return defaultTimeline }
-}
-function loadReunionDate() { return localStorage.getItem('closer-reunion-date') || '2027-02-08' }
-
 const loveReasons = [
   "I love your smile and how it can instantly make my day better.",
   "I love how you make me feel at home, even from miles away.",
@@ -176,8 +148,17 @@ const loveReasons = [
   "I love imagining holding you and not having to let go.",
   "I love you more than I can fit into a message.",
 ]
-function ReunionCountdown({ reunionDate }: { reunionDate: string }) {
-  const target = new Date(`${reunionDate || '2027-02-08'}T00:00:00`).getTime()
+
+const voiceMessages = [
+  { title: 'I love you ❤️', file: 'love-you.mp3', subtitle: 'A little reminder from me' },
+  { title: 'I love you ❤️', file: 'love-you1.mp3', subtitle: 'Another one, just for you' },
+  { title: 'When you miss me 💌', file: 'miss-you.mp3', subtitle: 'For the moments we feel far apart' },
+  { title: 'When you have a bad day 🫂', file: 'bad-day.mp3', subtitle: 'I am here for you' },
+  { title: 'Goodnight, my love 🌙', file: 'goodnight.mp3', subtitle: 'Listen before you sleep' },
+]
+
+function ReunionCountdown() {
+  const target = new Date('2027-02-08T00:00:00').getTime()
 
   const [time, setTime] = useState({
     days: 0,
@@ -216,7 +197,7 @@ function ReunionCountdown({ reunionDate }: { reunionDate: string }) {
         <div><strong>{String(time.seconds).padStart(2, '0')}</strong><span>seconds</span></div>
       </div>
 
-      <p>{reunionDate ? new Date(`${reunionDate}T00:00:00`).toLocaleDateString(undefined, { dateStyle: 'long' }) : 'Choose our reunion date'} · Every second brings me closer to you.</p>
+      <p>February 8, 2027 · Every second brings me closer to you.</p>
     </section>
   )
 }
@@ -242,33 +223,6 @@ const [songLink, setSongLink] = useState('')
 const [songNote, setSongNote] = useState('')
 const [envelopeOpen, setEnvelopeOpen] = useState(false)
 const [currentReason, setCurrentReason] = useState('')
-const [dailyHeart, setDailyHeart] = useState(false)
-const [reaction, setReaction] = useState('')
-const [flowers, setFlowers] = useState<{ id: number; flower: string; left: number; delay: number }[]>([])
-const [timelineEvents, setTimelineEvents] = useState<MemoryEvent[]>(() => { const saved = loadTimeline(); const beginning = localStorage.getItem('closer-start-date') || ''; return saved.map((item) => item.id === 1 ? { ...item, date: beginning || item.date } : item) })
-const [startDate, setStartDate] = useState(() => localStorage.getItem('closer-start-date') || '')
-const [reunionDate, setReunionDate] = useState(loadReunionDate)
-const [newMomentTitle, setNewMomentTitle] = useState('')
-const [newMomentDate, setNewMomentDate] = useState('')
-const [newMomentDescription, setNewMomentDescription] = useState('')
-
-useEffect(() => { localStorage.setItem('closer-timeline', JSON.stringify(timelineEvents)) }, [timelineEvents])
-useEffect(() => { localStorage.setItem('closer-start-date', startDate) }, [startDate])
-useEffect(() => { localStorage.setItem('closer-reunion-date', reunionDate) }, [reunionDate])
-
-const sendFlowerLove = () => {
-  setReaction('A little garden of love is on its way to you. ❤️')
-  const blooms = ['🌸', '🌺', '🌷', '✿', '❀', '💗']
-  const burst = Array.from({ length: 18 }, (_, i) => ({ id: Date.now() + i, flower: blooms[i % blooms.length], left: 4 + Math.random() * 92, delay: Math.random() * 0.8 }))
-  setFlowers(burst)
-  window.setTimeout(() => setFlowers([]), 4200)
-}
-
-const addTimelineMoment = () => {
-  if (!newMomentTitle.trim() || !newMomentDate) return
-  setTimelineEvents([...timelineEvents, { id: Date.now(), date: newMomentDate, title: newMomentTitle.trim(), description: newMomentDescription.trim() || 'A little moment we want to remember.', icon: '✦' }])
-  setNewMomentTitle(''); setNewMomentDate(''); setNewMomentDescription('')
-}
 
 useEffect(() => {
   localStorage.setItem('closer-songs', JSON.stringify(songs))
@@ -349,11 +303,9 @@ const addSong = () => {
     <small>YOUR DAILY LOVE NOTE ❤️</small>
     <p>{getDailyNote()}</p>
   </div>
-  <button className={`daily-heart ${dailyHeart ? 'hearted' : ''}`} aria-label="Send a heart" onClick={() => setDailyHeart(!dailyHeart)}>
-    <Heart size={17} fill={dailyHeart ? 'currentColor' : 'none'} />
-  </button>
+  <Heart size={17} fill="currentColor" />
 </section>
-<ReunionCountdown reunionDate={reunionDate} />
+<ReunionCountdown />
 {secretUnlocked && (
   <div className="secret-message">
     <h2>💌 A secret for you</h2>
@@ -365,12 +317,28 @@ const addSong = () => {
     </p>
   </div>
 )}
+
+          <section className="voice-messages">
+            <div className="voice-heading">
+              <span className="eyebrow">A LITTLE PIECE OF MY VOICE 🎧</span>
+              <h2>Voice messages</h2>
+              <p>Whenever you want to hear me, I'm right here.</p>
+            </div>
+            <div className="voice-list">
+              {voiceMessages.map((audio) => (
+                <div className="voice-card" key={audio.file}>
+                  <div className="voice-card-copy"><strong>{audio.title}</strong><small>{audio.subtitle}</small></div>
+                  <audio controls preload="none" src={`/audio/${audio.file}`}>Your browser does not support audio playback.</audio>
+                </div>
+              ))}
+            </div>
+          </section>
           <h2 className="section-heading">What do you need right now?</h2>
           <div className="feature-grid">
             {features.map((feature) => {
               const Icon = feature.icon
               return (
-                <button key={feature.id} className={`feature-card ${feature.color} tap-card`} onClick={() => { setSection(feature.id); setMessage(''); setLetter(null) }}>
+                <button key={feature.id} className={`feature-card ${feature.color}`} onClick={() => { setSection(feature.id); setMessage(''); setLetter(null) }}>
                   <span className="feature-icon"><Icon size={21} /></span>
                   <strong>{feature.title}</strong>
                   <small>{feature.subtitle}</small>
@@ -405,23 +373,6 @@ const addSong = () => {
            <button className="extra-card" onClick={() => setSection('soundtrack')}>
   <Music size={19} />
   <span><strong>Our soundtrack</strong><small>Songs that remind us of each other</small></span>
-  <span>→</span>
-</button>
-<button className="extra-card" onClick={() => setSection('today')}>
-  <Sparkles size={19} />
-  <span>
-    <strong>Today with Chris</strong>
-    <small>A little moment for us, every day</small>
-  </span>
-  <span>→</span>
-</button>
-
-<button className="extra-card" onClick={() => setSection('timeline')}>
-  <Heart size={19} />
-  <span>
-    <strong>Our Story</strong>
-    <small>Our journey and favorite milestones</small>
-  </span>
   <span>→</span>
 </button>
           </section>
@@ -476,7 +427,7 @@ const addSong = () => {
               <span className="eyebrow">A MESSAGE FROM CHRIS</span>
               <h1>{section === 'miss' ? 'Missing me?' : section === 'sleep' ? 'Rest, my love.' : section === 'badday' ? 'You’ve got this.' : 'Let me make you smile.'}</h1>
               <p className="page-copy">{message || 'Whenever you need a little reminder, tap below.'}</p>
-              <button className="primary-button tap-card" onClick={() => randomMessage(section as keyof typeof messages)}><Sparkles size={18} /> {message ? 'Another little message' : 'Give me a message'}</button>
+              <button className="primary-button" onClick={() => randomMessage(section as keyof typeof messages)}><Sparkles size={18} /> {message ? 'Another little message' : 'Give me a message'}</button>
               {section === 'sleep' && <div className="night-note">🌙 A little reminder: you don't have to carry tomorrow tonight.</div>}
             </div>
           )}
@@ -600,66 +551,9 @@ Chris ❤️`}</p>
                 <span className="reason-heart">♥</span>
                 <p>{currentReason || 'Tap below for a little reminder of why you mean so much to me.'}</p>
               </div>
-              <button className="primary-button tap-card" onClick={() => setCurrentReason(loveReasons[Math.floor(Math.random() * loveReasons.length)])}>
+              <button className="primary-button" onClick={() => setCurrentReason(loveReasons[Math.floor(Math.random() * loveReasons.length)])}>
                 <Sparkles size={18} /> Give me another reason
               </button>
-            </div>
-          )}
-
-          {section === 'today' && (
-            <div className="today-page">
-              <span className="eyebrow">A LITTLE MOMENT FOR US ✨</span>
-              <h1>Today with Chris</h1>
-              <p className="page-copy">A small way to feel close, even from far away.</p>
-              <div className="today-note-card">
-                <span>💌 Today's note</span>
-                <p>{getTodayIdea().note}</p>
-              </div>
-              <div className="today-prompt-card">
-                <span>💭 Today's question</span>
-                <p>{getTodayIdea().question}</p>
-              </div>
-              <div className="today-prompt-card activity">
-                <span>🌷 A tiny activity</span>
-                <p>{getTodayIdea().activity}</p>
-              </div>
-              <button className="primary-button reaction-button" onClick={sendFlowerLove}>
-                <Heart size={18} fill="currentColor" /> Send me a little love
-              </button>
-              {flowers.map((bloom) => <span key={bloom.id} className="floating-flower" style={{ left: `${bloom.left}%`, animationDelay: `${bloom.delay}s` }}>{bloom.flower}</span>)}
-              {reaction && <p className="today-reaction">{reaction}</p>}
-            </div>
-          )}
-
-          {section === 'timeline' && (
-            <div className="timeline-page">
-              <span className="eyebrow">OUR JOURNEY ❤️</span>
-              <h1>Our story</h1>
-              <p className="page-copy">Little moments, big feelings, and everything still ahead of us.</p>
-              <div className="timeline-edit-panel">
-                <label>Our beginning date<input type="date" value={startDate} onChange={(e) => { setStartDate(e.target.value); setTimelineEvents(timelineEvents.map((item) => item.id === 1 ? { ...item, date: e.target.value } : item)) }} /></label>
-                <label>Our next reunion<input type="date" value={reunionDate} onChange={(e) => setReunionDate(e.target.value)} /></label>
-              </div>
-              <div className="timeline">
-                {[...timelineEvents, { id: -1, date: new Date().toISOString().slice(0,10), title: 'Still choosing each other', description: 'Every day apart is another day closer to the life and memories waiting for us.', icon: '♥' }, { id: -2, date: reunionDate, title: 'Our next reunion', description: 'The day I get to hold you again. One more milestone to look forward to.', icon: '♡' }].sort((a,b) => (a.date || '9999').localeCompare(b.date || '9999')).map((event, index) => (
-                  <div className="timeline-item" key={index}>
-                    <div className="timeline-dot">{event.icon}</div>
-                    <div className="timeline-card">
-                      <small>{event.date ? new Date(`${event.date}T00:00:00`).toLocaleDateString(undefined, { dateStyle: 'long' }) : 'Add a date'}</small>
-                      <h3>{event.title}</h3>
-                      <p>{event.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="add-moment-form">
-                <h3>Add a little moment ✨</h3>
-                <input placeholder="Moment title" value={newMomentTitle} onChange={(e) => setNewMomentTitle(e.target.value)} />
-                <input type="date" value={newMomentDate} onChange={(e) => setNewMomentDate(e.target.value)} />
-                <textarea placeholder="Tell the story (optional)" value={newMomentDescription} onChange={(e) => setNewMomentDescription(e.target.value)} />
-                <button className="primary-button" onClick={addTimelineMoment}>Add to our story</button>
-                {timelineEvents.filter((e) => e.id !== 1 && e.id !== 2).map((event) => <button className="delete-moment" key={event.id} onClick={() => setTimelineEvents(timelineEvents.filter((item) => item.id !== event.id))}>Remove “{event.title}” ×</button>)}
-              </div>
             </div>
           )}
 

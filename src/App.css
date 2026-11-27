@@ -985,79 +985,14 @@ footer {
 
 
 
-/* TODAY + TIMELINE */
-.daily-heart {
-  border: 0;
-  background: transparent;
-  color: #ca7b9a;
-  padding: 7px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform .25s ease, background .25s ease;
-}
-.daily-heart:hover { transform: scale(1.15); background: #fff0f5; }
-.daily-heart.hearted { animation: heartPop .35s ease; color: #d45e88; }
-.tap-card { -webkit-tap-highlight-color: transparent; }
-.tap-card:active, .feature-card:active, .extra-card:active, .primary-button:active {
-  transform: scale(.97);
-}
-.today-page, .timeline-page { padding: 34px 0; text-align: center; animation: fadeIn .35s ease; }
-.today-note-card, .today-prompt-card {
-  text-align: left;
-  background: #fff;
-  border: 1px solid #f5dfe8;
-  border-radius: 20px;
-  padding: 20px;
-  margin: 16px 0;
-  box-shadow: 0 7px 20px #d7a5bb12;
-}
-.today-note-card { background: linear-gradient(135deg, #fff0f5, #fffaf8); }
-.today-note-card span, .today-prompt-card span { color: #bd6f91; font-size: 11px; font-weight: 700; letter-spacing: .8px; }
-.today-note-card p, .today-prompt-card p { color: #754b62; font-family: 'Playfair Display', serif; font-size: 17px; line-height: 1.7; margin: 10px 0 0; }
-.today-prompt-card.activity { background: #f6f0ff; border-color: #e9ddfa; }
-.today-reaction { color: #bc7191; font-size: 13px; margin-top: 18px; animation: fadeIn .35s ease; }
-.timeline { text-align: left; margin: 30px 0; position: relative; }
-.timeline::before { content: ''; position: absolute; left: 17px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(#e6a8bf, #e5d5f6); }
-.timeline-item { display: flex; gap: 14px; position: relative; margin-bottom: 18px; }
-.timeline-dot { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 50%; display: grid; place-items: center; background: #fff0f5; border: 1px solid #f2d5e1; color: #c16c91; z-index: 1; }
-.timeline-card { flex: 1; background: #fff; border: 1px solid #f4e1e9; border-radius: 18px; padding: 16px; box-shadow: 0 5px 18px #d7a5bb12; }
-.timeline-card small { color: #bc7998; font-size: 10px; letter-spacing: .8px; }
-.timeline-card h3 { font-family: 'Playfair Display', serif; color: #704b61; font-size: 17px; margin: 7px 0; font-weight: 500; }
-.timeline-card p { color: #987b8d; font-size: 12px; line-height: 1.7; margin: 0; }
-.timeline-note { color: #ad8a9d; font-size: 11px; line-height: 1.6; }
-@keyframes heartPop { 0% { transform: scale(.8); } 55% { transform: scale(1.35); } 100% { transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-}
-@media (max-width: 480px) {
-  .home, .inner-page { padding-left: 16px; padding-right: 16px; }
-  .feature-grid { gap: 9px; }
-  .feature-card { padding: 13px; min-height: 118px; }
-  .today-note-card, .today-prompt-card, .timeline-card { padding: 16px; }
-}
-
-/* Flower love burst */
-.today-page { position: relative; overflow: visible; }
-.floating-flower {
-  position: fixed; bottom: -40px; z-index: 9999; pointer-events: none;
-  font-size: clamp(22px, 4vw, 34px); animation: flowerFloat 3.8s ease-in forwards;
-  filter: drop-shadow(0 3px 5px #e9a6c455);
-}
-@keyframes flowerFloat {
-  0% { transform: translateY(0) rotate(0deg) scale(.65); opacity: 0; }
-  12% { opacity: 1; }
-  75% { opacity: .95; }
-  100% { transform: translateY(-110vh) rotate(360deg) scale(1.2); opacity: 0; }
-}
-.timeline-edit-panel, .add-moment-form {
-  text-align: left; background: #fffafd; border: 1px solid #f2dce7; border-radius: 18px;
-  padding: 16px; margin: 18px 0; display: grid; gap: 12px;
-}
-.timeline-edit-panel label { color: #986b84; font-size: 12px; font-weight: 600; display: grid; gap: 6px; }
-.timeline-edit-panel input, .add-moment-form input, .add-moment-form textarea {
-  width: 100%; box-sizing: border-box; border: 1px solid #ead5e0; border-radius: 11px;
-  background: white; padding: 11px 12px; color: #704b61; font: inherit; outline: none;
-}
-.add-moment-form h3 { color: #704b61; margin: 0; font-family: 'Playfair Display', serif; font-weight: 500; }
-.add-moment-form textarea { min-height: 85px; resize: vertical; }
-.delete-moment { border: 0; background: transparent; color: #b57a96; font-size: 12px; padding: 5px; cursor: pointer; }
+/* Voice messages */
+.voice-messages { margin: 28px 0; }
+.voice-heading { text-align: center; margin-bottom: 16px; }
+.voice-heading h2 { margin: 8px 0; }
+.voice-heading p { color: #9b7186; font-size: 13px; margin: 0; }
+.voice-list { display: grid; gap: 12px; }
+.voice-card { background: #fff9fc; border: 1px solid #f2d6e3; border-radius: 16px; padding: 14px; display: grid; gap: 10px; }
+.voice-card-copy { display: grid; gap: 4px; }
+.voice-card-copy strong { color: #70445a; }
+.voice-card-copy small { color: #ad8297; font-size: 12px; }
+.voice-card audio { width: 100%; height: 38px; }
